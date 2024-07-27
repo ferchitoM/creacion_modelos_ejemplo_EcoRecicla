@@ -30,4 +30,8 @@ public class Material {
         this.price = price;
         this.gain = this.price * this.weight;
     }
+
+    public void calculateGain() {
+        this.gain = this.price * this.weight;
+    }
 }

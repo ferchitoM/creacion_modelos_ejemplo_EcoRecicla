@@ -2,6 +2,9 @@ package com.example.creacion_modelos;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView lista;
     MaterialRecyclingAdapter adapter;
     ArrayList<Material> baseMaterials;
+    Button botonRegistrar;
+    TextView totalGains;
+    Recycling recycling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +44,25 @@ public class MainActivity extends AppCompatActivity {
         baseMaterials.add(new Material("Plástico", 2000));
         baseMaterials.add(new Material("Vidrio", 800));
 
+        recycling = new Recycling();
+        recycling.materials = baseMaterials;
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
-        lista = findViewById(R.id.lista);
+        lista           = findViewById(R.id.lista);
+        botonRegistrar  = findViewById(R.id.botonRegistrar);
+        totalGains      = findViewById(R.id.totalGains);
+
         lista   .setLayoutManager(layoutManager);
         lista   .setHasFixedSize(true);
 
-        adapter = new MaterialRecyclingAdapter(baseMaterials);
+        adapter = new MaterialRecyclingAdapter(this, recycling.materials);
         lista.setAdapter(adapter);
 
+        botonRegistrar.setOnClickListener(view -> {
+            recycling.calculateToalGain();
+            Toast.makeText(this, "Total gains: $ " + recycling.gains + " COP", Toast.LENGTH_SHORT).show();
+        });
 
     }
 }

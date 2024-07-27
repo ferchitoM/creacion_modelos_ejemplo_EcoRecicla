@@ -17,9 +17,11 @@ import java.util.zip.Inflater;
 
 public class MaterialRecyclingAdapter extends RecyclerView.Adapter<MaterialRecyclingAdapter.MyViewHolder> {
 
+    public MainActivity mainActivity;
     public ArrayList<Material> materials;
 
-    public MaterialRecyclingAdapter(ArrayList<Material> materials){
+    public MaterialRecyclingAdapter(MainActivity mainActivity, ArrayList<Material> materials){
+        this.mainActivity = mainActivity;
         this.materials = materials;
     }
 
@@ -47,56 +49,53 @@ public class MaterialRecyclingAdapter extends RecyclerView.Adapter<MaterialRecyc
 
         holder.price.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No se necesita hacer nada aquí
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 String value = holder.price.getText().toString();
 
-                if(value.length() > 0) {
+                if(!value.isEmpty()) {
 
                     double newPrice = Double.parseDouble(value);
-
                     material.calculateGain(newPrice);
                     holder.gain.setText(material.gain + "");
+
+                    mainActivity.recycling.calculateToalGain();
+                    mainActivity.totalGains.setText("Total ganancia: $ " + mainActivity.recycling.gains + " COP");
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+            public void afterTextChanged(Editable editable) {}
 
         });
 
         holder.weight.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No se necesita hacer nada aquí
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 String value = holder.weight.getText().toString();
 
-                if(value.length() > 0) {
+                if(!value.isEmpty()) {
 
                     double newWeight = Double.parseDouble(value);
 
                     material.weight = newWeight;
-                    material.calculateGain(material.price);
+                    material.calculateGain();
                     holder.gain.setText(material.gain + "");
+
+                    mainActivity.recycling.calculateToalGain();
+                    mainActivity.totalGains.setText("Total ganancia: $ " + mainActivity.recycling.gains + " COP");
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+            public void afterTextChanged(Editable editable) {}
 
         });
 

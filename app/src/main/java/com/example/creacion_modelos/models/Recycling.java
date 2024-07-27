@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class Recycling {
 
-    public LocalDateTime    dateTime;
-    public double           gains; //ganancias
-    ArrayList<Material>     materials;
+    public LocalDateTime            dateTime;
+    public double                   gains; //ganancias
+    public ArrayList<Material>      materials;
 
     public Recycling() {
         this.dateTime   = LocalDateTime.now(); //current date and time
