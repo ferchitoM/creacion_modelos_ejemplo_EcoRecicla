@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Material>         baseMaterials;
     Button                      botonRegistrar;
     Button                      botonReiniciar;
+    Button                      botonRecords;
     TextView                    totalGains;
     Recycling                   recycling;
 
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         lista           = findViewById(R.id.lista);
         botonRegistrar  = findViewById(R.id.botonRegistrar);
         botonReiniciar  = findViewById(R.id.botonReiniciar);
+        botonRecords    = findViewById(R.id.botonRecords);
         totalGains      = findViewById(R.id.totalGains);
 
         lista           .setLayoutManager(layoutManager);
@@ -77,8 +79,6 @@ public class MainActivity extends AppCompatActivity {
             //Agregamos el reciclaje al usuario
             user.addRecycling(recycling);
 
-            user.showRecyclings();
-
             //Guardamos los cambios en la base de datos
             storageRecyclingInDatabase();
 
@@ -89,6 +89,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
 
             Toast.makeText(this, "Ya puedes registrar otro reciclaje", Toast.LENGTH_SHORT).show();
+        });
+
+        botonRecords.setOnClickListener(view -> {
+            Intent intent = new Intent(this, RecordsActivity.class);
+            startActivity(intent);
         });
 
     }

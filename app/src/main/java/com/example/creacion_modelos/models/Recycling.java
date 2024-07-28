@@ -29,18 +29,25 @@ public class Recycling {
         this.materials.add(material);
     }
 
-    public void showMaterials(){
+    public String showMaterials(){
+
+        String lista = "";
         for (Material m : materials) {
-            Log.e("msg","Material: " + m.name);
-            Log.e("msg","Price: " + m.price);
-            Log.e("msg","Weight: " + m.weight);
-            Log.e("msg","Gain: " + m.gain);
-            Log.e("msg", "-------------------");
+
+            lista += "> Material: " + m.name + "\n";
+            lista += "      + Price: " + m.price + "\n";
+            lista += "      + Weight: " + m.weight + "\n";
+            lista += "      = Gain: $ " + m.gain + " COP\n";
+            lista += "  ----------------------------------------\n";
         }
 
         calculateToalGain();
-        Log.e("msg", "Total gains: " + this.gains);
-        Log.e("msg", "");
+
+        lista += "  Total gains: $ " + this.gains + " COP\n";
+        lista += "================================\n\n";
+
+
+        return lista;
     }
 
     public void deleteEmptyMaterials(){

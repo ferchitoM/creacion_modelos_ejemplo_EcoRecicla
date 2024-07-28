@@ -184,4 +184,32 @@ public class FileManager {
         }
 
     }
+
+    public boolean readRecyclingsFromUser(User user) {
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(userFile));
+
+            String data;
+            while ((data = reader.readLine()) != null) {
+
+                //Convertimos el dato leido en un objeto de tipo User
+                User dbUser = new Gson().fromJson(data, User.class);
+
+                //Si encontramos los registros el usuario los almacenamos en el objeto user
+                if (dbUser.email.equals(user.email)) {
+                    user.recyclings = dbUser.recyclings;
+
+                    return true;
+                }
+            }
+            reader.close();
+
+        } catch (IOException e) {
+            Toast.makeText(context, "Error al leer el archivo " + userFile.getName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        //Si llega hasta acá es porque el usuario no tiene ningún registro de reciclaje
+        return false;
+    }
 }

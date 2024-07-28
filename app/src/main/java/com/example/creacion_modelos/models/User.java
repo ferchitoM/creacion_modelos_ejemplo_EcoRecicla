@@ -70,16 +70,16 @@ public class User extends Application {
         this.recyclings.add(recycling);
     }
 
-    public void showRecyclings(){
-        Log.e("msg", "Reciclaje de " + this.name + ":");
-        Log.e("msg", "----------------------------------------------");
+    public String showRecyclings(){
+
+        String lista = "";
 
         for (Recycling r : this.recyclings) {
-            Log.e("msg", "Fecha reciclaje: " + r.dateTime.toString());
-            Log.e("msg", "----------------------------------------------");
-
-            r.showMaterials();
+            lista += "Fecha reciclaje: " + r.dateTime.toString() + "\n\n";
+            lista += r.showMaterials();
         }
+
+        return lista;
     }
 
     public String objetcToJSON (){
