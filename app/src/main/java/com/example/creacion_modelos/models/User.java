@@ -29,6 +29,7 @@ public class User extends Application {
         this.recyclings     = new ArrayList<Recycling>();
     }
 
+
     public User(String name, String surName, String imageProfile, String email, Long phone, String password, String gender, int age) {
         this.name           = name;
         this.surName        = surName;
@@ -39,6 +40,30 @@ public class User extends Application {
         this.gender         = gender;
         this.age            = age;
         this.recyclings     = new ArrayList<Recycling>();
+    }
+
+    public void setDefaultData(){
+        this.name           = "";
+        this.surName        = "";
+        this.imageProfile   = "";
+        this.email          = "";
+        this.phone          = 0L;
+        this.password       = "";
+        this.gender         = "";
+        this.age            = 0;
+        this.recyclings     = new ArrayList<Recycling>();
+    }
+
+    public void copyData(User newData){
+        this.name           = newData.name;
+        this.surName        = newData.surName;
+        this.imageProfile   = newData.imageProfile;
+        this.email          = newData.email;
+        this.phone          = newData.phone;
+        this.password       = newData.password;
+        this.gender         = newData.gender;
+        this.age            = newData.age;
+        this.recyclings     = newData.recyclings;
     }
 
     public void addRecycling(Recycling recycling) {

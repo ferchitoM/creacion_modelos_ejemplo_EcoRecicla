@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     MaterialRecyclingAdapter    adapter;
     ArrayList<Material>         baseMaterials;
     Button                      botonRegistrar;
+    Button                      botonReiniciar;
     TextView                    totalGains;
     Recycling                   recycling;
 
@@ -48,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         baseMaterials.add(new Material("Plástico", 2000));
         baseMaterials.add(new Material("Vidrio", 800));
 
+        //Recuperamos el usuario GLOBAL de la aplicación
+        user = ((User)getApplicationContext());
+
         recycling = new Recycling();
         recycling.materials = baseMaterials;
 
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         lista           = findViewById(R.id.lista);
         botonRegistrar  = findViewById(R.id.botonRegistrar);
+        botonReiniciar  = findViewById(R.id.botonReiniciar);
         totalGains      = findViewById(R.id.totalGains);
 
         lista           .setLayoutManager(layoutManager);
@@ -65,19 +70,25 @@ public class MainActivity extends AppCompatActivity {
 
         botonRegistrar.setOnClickListener(view -> {
             recycling.calculateToalGain();
-            Log.e("msg", "Recycling datetime: " + recycling.dateTime);
+            recycling.deleteEmptyMaterials();
 
-            Toast.makeText(this, "Total gains: $ " + recycling.gains + " COP", Toast.LENGTH_SHORT).show();
-
-            //Recuperamos el usuario GLOBAL de la aplicación
-            user = ((User)getApplicationContext());
+            //Toast.makeText(this, "Total gains: $ " + recycling.gains + " COP", Toast.LENGTH_SHORT).show();
 
             //Agregamos el reciclaje al usuario
             user.addRecycling(recycling);
 
+            user.showRecyclings();
+
             //Guardamos los cambios en la base de datos
             storageRecyclingInDatabase();
 
+        });
+
+        botonReiniciar.setOnClickListener(view -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+
+            Toast.makeText(this, "Ya puedes registrar otro reciclaje", Toast.LENGTH_SHORT).show();
         });
 
     }

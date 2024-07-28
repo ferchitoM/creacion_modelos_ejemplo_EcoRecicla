@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
             //Si no hay errores de validación entonces registramos el usuario
             if(!errorResult){
                 //Registrar usuario en base de datos
-                user = new User();
+                user            = new User();
                 user.name       = name.getText().toString();
                 user.surName    = surname.getText().toString();
                 user.email      = email.getText().toString();

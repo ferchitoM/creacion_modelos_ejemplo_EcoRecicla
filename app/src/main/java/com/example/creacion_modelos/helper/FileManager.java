@@ -107,7 +107,7 @@ public class FileManager {
         return false;
     }
 
-    public boolean findUserByEmailAndPassword(User user) {
+    public User findUserByEmailAndPassword(User user) {
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(userFile));
@@ -125,7 +125,7 @@ public class FileManager {
                 if (dbUser.email.equals(user.email) && dbUser.password.equals(user.password)) {
                     Log.e("msg", "Email: " + user.email + ", Password: " + user.password + " <- Correct!");
 
-                    return true;
+                    return dbUser;
                 }
             }
 
@@ -136,7 +136,7 @@ public class FileManager {
         }
 
         //Si llega hasta acá es porque los datos del usuario no coinciden con los registros de la base de datos
-        return false;
+        return null;
     }
 
     public void insertNewRecycling(User user) {

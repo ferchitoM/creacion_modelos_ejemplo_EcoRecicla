@@ -43,6 +43,17 @@ public class Recycling {
         Log.e("msg", "");
     }
 
+    public void deleteEmptyMaterials(){
+        ArrayList<Material> materials = new ArrayList<Material>();
+        materials.addAll(this.materials);
+
+        for (Material m : materials) {
+            if(m.weight == 0){
+                this.materials.remove(m);
+            }
+        }
+    }
+
     public void calculateToalGain(){
         this.gains = 0;
 

@@ -2,6 +2,7 @@ package com.example.creacion_modelos;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -51,8 +52,9 @@ public class LoginActivity extends AppCompatActivity {
         String email    = this.email.getText().toString();
         String password = this.password.getText().toString();
 
-        //Guardamos el usuario GLOBAL de la aplicación
-        user            = ((User)getApplicationContext());
+        //Obtenemos el usuario GLOBAL de la aplicación
+        user            = (User) getApplicationContext();
+        user            .setDefaultData();
         user.email      = email;
         user.password   = Encrypt.encryptPassword(password); //Encriptamos la constraseña ingresada
 
@@ -61,7 +63,11 @@ public class LoginActivity extends AppCompatActivity {
             FileManager fileManager = new FileManager(this);
 
             //Validar credenciales en base de datos
-            if (fileManager.findUserByEmailAndPassword(user)) {
+            User result = fileManager.findUserByEmailAndPassword(user);
+
+            if (result != null) {
+
+                user.copyData(result); //Actualizamos el usuario GLOBAL de la aplicación con los datos de la base de datos
 
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
