@@ -1,5 +1,6 @@
 package com.example.creacion_modelos;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -14,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.creacion_modelos.helper.FileManager;
 import com.example.creacion_modelos.models.Material;
 import com.example.creacion_modelos.models.Recycling;
 import com.example.creacion_modelos.models.User;
@@ -25,12 +27,14 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    RecyclerView lista;
-    MaterialRecyclingAdapter adapter;
-    ArrayList<Material> baseMaterials;
-    Button botonRegistrar;
-    TextView totalGains;
-    Recycling recycling;
+    User                        user;
+
+    RecyclerView                lista;
+    MaterialRecyclingAdapter    adapter;
+    ArrayList<Material>         baseMaterials;
+    Button                      botonRegistrar;
+    TextView                    totalGains;
+    Recycling                   recycling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,16 +57,34 @@ public class MainActivity extends AppCompatActivity {
         botonRegistrar  = findViewById(R.id.botonRegistrar);
         totalGains      = findViewById(R.id.totalGains);
 
-        lista   .setLayoutManager(layoutManager);
-        lista   .setHasFixedSize(true);
+        lista           .setLayoutManager(layoutManager);
+        lista           .setHasFixedSize(true);
 
         adapter = new MaterialRecyclingAdapter(this, recycling.materials);
         lista.setAdapter(adapter);
 
         botonRegistrar.setOnClickListener(view -> {
             recycling.calculateToalGain();
+            Log.e("msg", "Recycling datetime: " + recycling.dateTime);
+
             Toast.makeText(this, "Total gains: $ " + recycling.gains + " COP", Toast.LENGTH_SHORT).show();
+
+            //Recuperamos el usuario GLOBAL de la aplicación
+            user = ((User)getApplicationContext());
+
+            //Agregamos el reciclaje al usuario
+            user.addRecycling(recycling);
+
+            //Guardamos los cambios en la base de datos
+            storageRecyclingInDatabase();
+
         });
 
+    }
+
+    private void storageRecyclingInDatabase(){
+
+        FileManager fileManager = new FileManager(this);
+        fileManager.insertNewRecycling(user);
     }
 }

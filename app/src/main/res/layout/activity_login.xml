@@ -59,7 +59,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Ingresa tu correo"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:text="fer@marles.com" />
         </LinearLayout>
 
         <LinearLayout
@@ -83,7 +84,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Contraseña"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:text="fernando2024" />
         </LinearLayout>
 
     </LinearLayout>

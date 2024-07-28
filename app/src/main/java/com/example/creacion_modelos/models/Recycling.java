@@ -2,23 +2,25 @@ package com.example.creacion_modelos.models;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Recycling {
 
-    public LocalDateTime            dateTime;
+    public String                   dateTime;
     public double                   gains; //ganancias
     public ArrayList<Material>      materials;
 
     public Recycling() {
-        this.dateTime   = LocalDateTime.now(); //current date and time
+        this.dateTime   = LocalDateTime.now().toString(); //current date and time
         this.gains      = 0;
         this.materials  = new ArrayList<Material>();
     }
 
     public Recycling(double gains, ArrayList<Material> materials) {
-        this.dateTime   = LocalDateTime.now(); //current date and time
+        this.dateTime   = LocalDateTime.now().toString(); //current date and time
         this.gains      = gains;
         this.materials  = materials;
     }
@@ -47,5 +49,14 @@ public class Recycling {
         for (Material m : materials) {
             this.gains += m.gain;
         }
+    }
+
+    public String objetcToJSON (){
+
+        String jsonData = new Gson().toJson(this);
+        Log.e("msg", "Recycling to json: " + jsonData);
+
+        return jsonData;
+
     }
 }

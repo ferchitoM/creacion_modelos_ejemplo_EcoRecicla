@@ -1,6 +1,7 @@
 package com.example.creacion_modelos.helper;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -104,5 +105,25 @@ public class Validation2 {
             return;
         }
 
+    }
+
+    public boolean showErrorMessages(TextView errors){
+
+        String msg = "";
+
+        for(String error : errorMessages) {
+            msg += "*" + error + "\n";
+        }
+
+        if(!msg.isEmpty()){
+            errors.setText(msg);
+            errors.setVisibility(View.VISIBLE);
+            return true;
+        }
+        else {
+            errors.setText("");
+            errors.setVisibility(View.GONE);
+            return false;
+        }
     }
 }
