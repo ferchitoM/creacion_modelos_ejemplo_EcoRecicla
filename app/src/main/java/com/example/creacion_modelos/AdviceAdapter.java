@@ -5,7 +5,10 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -43,23 +46,44 @@ public class AdviceAdapter extends RecyclerView.Adapter<AdviceAdapter.MyViewHold
         holder.description.setText(advice.description);
 
         if(!advice.url.isEmpty()) {
-            holder.url.setVisibility(View.VISIBLE);
+            holder.videoLocal.setVisibility(View.VISIBLE);
             holder.image.setVisibility(View.GONE);
 
-            int idVideo = context.getResources().getIdentifier(advice.url, "raw", context.getPackageName());
-            String carpetaRecursos = "android.resource://" + context.getPackageName() + "/";
-            Uri uri = Uri.parse(carpetaRecursos + idVideo);
+            if(advice.isLink){
+                showVideoOnline(holder, advice.url);
+            }
+            else {
+                int idVideo = context.getResources().getIdentifier(advice.url, "raw", context.getPackageName());
+                String carpetaRecursos = "android.resource://" + context.getPackageName() + "/";
+                Uri uri = Uri.parse(carpetaRecursos + idVideo);
 
-            holder.url.setVideoURI(uri);
-            //holder.url.start();
+                holder.videoLocal.setVideoURI(uri);
+
+                MediaController mediaController = new MediaController(context);
+                mediaController.setAnchorView(holder.videoLocal);
+                holder.videoLocal.setMediaController(mediaController);
+            }
         }
         else {
             int idImage = context.getResources().getIdentifier(advice.image, "mipmap", context.getPackageName());
             holder.image.setImageResource(idImage);
-
-            holder.url.setVisibility(View.GONE);
         }
 
+    }
+
+    public void showVideoOnline(AdviceAdapter.MyViewHolder holder, String linkVideo){
+
+        holder.videoOnline.setVisibility(View.VISIBLE);
+        holder.videoLocal.setVisibility(View.GONE);
+        holder.image.setVisibility(View.GONE);
+
+        String iframeHtml = "<iframe width=\"100%\" height=\"100%\" src=\"" + linkVideo + "\" title=\"YouTube video player\" " +
+                "frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" " +
+                "referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>";
+
+        holder.videoOnline.loadData(iframeHtml, "text/html", "utf-8");
+        holder.videoOnline.getSettings().setJavaScriptEnabled(true);
+        holder.videoOnline.setWebChromeClient(new WebChromeClient());
     }
 
     @Override
@@ -70,7 +94,8 @@ public class AdviceAdapter extends RecyclerView.Adapter<AdviceAdapter.MyViewHold
         ImageView   image;
         TextView    title;
         TextView    description;
-        VideoView   url;
+        VideoView   videoLocal;
+        WebView videoOnline;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,7 +103,8 @@ public class AdviceAdapter extends RecyclerView.Adapter<AdviceAdapter.MyViewHold
             image = itemView.findViewById(R.id.image);
             title = itemView.findViewById(R.id.title);
             description = itemView.findViewById(R.id.description);
-            url = itemView.findViewById(R.id.url);
+            videoLocal = itemView.findViewById(R.id.videoLocal);
+            videoOnline = itemView.findViewById(R.id.videoOnline);
         }
     }
 }

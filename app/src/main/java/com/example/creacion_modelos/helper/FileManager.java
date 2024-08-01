@@ -218,7 +218,7 @@ public class FileManager {
 
         try {
             //Guardamos los consejos en la base de datos
-            BufferedWriter writer = new BufferedWriter(new FileWriter(advicesFile, false));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(advicesFile, false)); //false para sobreescribir el archivo
 
             for (Advice a: adviceList) {
                 writer.write(a.objetcToJSON()); //Insertamos el consejo en formato JSON dentro del archivo de texto

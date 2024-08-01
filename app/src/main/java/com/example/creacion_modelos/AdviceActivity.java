@@ -20,6 +20,7 @@ public class AdviceActivity extends AppCompatActivity {
 
     ArrayList<Advice> consejos;
     RecyclerView lista;
+    RecyclerView listaHorizontal;
     AdviceAdapter adapter;
 
     @Override
@@ -28,9 +29,11 @@ public class AdviceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_advice);
 
         consejos = new ArrayList<Advice>();
-        consejos.add(new Advice("Cómo reciclar tu papel", "Puedes reciclar papel de manera eficiente y sin contaminar el medio ambiente", "consejo1", ""));
-        consejos.add(new Advice("Cómo reciclar tu cartón", "Puedes reciclar cartón de manera eficiente y sin contaminar el medio ambiente", "consejo1", "video_reciclaje"));
-        consejos.add(new Advice("Cómo reciclar tu metal", "Puedes reciclar metal de manera eficiente y sin contaminar el medio ambiente", "consejo1", ""));
+        consejos.add(new Advice("Cómo reciclar tu vidrio", "Puedes reciclar vidrio de manera eficiente y sin contaminar el medio ambiente", "", "https://www.youtube.com/embed/WVrxkF6TcQU?si=7GitKFGdncSmNdyn", true));
+        consejos.add(new Advice("Cómo reciclar tu papel", "Puedes reciclar papel de manera eficiente y sin contaminar el medio ambiente", "consejo1", "", false));
+        consejos.add(new Advice("Cómo reciclar tu cartón", "Puedes reciclar cartón de manera eficiente y sin contaminar el medio ambiente", "", "video_reciclaje", false));
+        consejos.add(new Advice("Cómo reciclar tu metal", "Puedes reciclar metal de manera eficiente y sin contaminar el medio ambiente", "consejo1", "", false));
+        consejos.add(new Advice("Cómo reciclar tus residuos orgánicos", "Puedes reciclar tus residuos orgánicos de manera eficiente y sin contaminar el medio ambiente", "consejo1", "", false));
 
         FileManager fileManager = new FileManager(this);
         fileManager.insertAdvices(consejos);
@@ -46,6 +49,15 @@ public class AdviceActivity extends AppCompatActivity {
 
         adapter = new AdviceAdapter(this, consejosDB);
         lista   .setAdapter(adapter);
+
+
+        //Lista horizontal
+        LinearLayoutManager lmHorizontal
+                        = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        listaHorizontal = findViewById(R.id.listaHorizontal);
+        listaHorizontal .setLayoutManager(lmHorizontal);
+        listaHorizontal .setHasFixedSize(true);
+        listaHorizontal .setAdapter(adapter);
 
 
 
