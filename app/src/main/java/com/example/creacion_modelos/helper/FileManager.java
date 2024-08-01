@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.creacion_modelos.models.Advice;
 import com.example.creacion_modelos.models.Recycling;
 import com.example.creacion_modelos.models.User;
 import com.google.gson.Gson;
@@ -20,8 +21,8 @@ import java.util.ArrayList;
 public class FileManager {
 
     private Context     context;
-    public File         userFile;
-    public File         advicesFile;
+    public File         userFile; //Almacenar la información de los usuarios
+    public File         advicesFile; //Almacenar los concejos
 
     public FileManager(Context context) {
         this.context    = context;
@@ -45,7 +46,7 @@ public class FileManager {
 
                 return file;
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Log.e("msg", "Error al crear el archivo " + file.getName(), e);
                 return null;
             }
@@ -211,5 +212,59 @@ public class FileManager {
 
         //Si llega hasta acá es porque el usuario no tiene ningún registro de reciclaje
         return false;
+    }
+
+    public void insertAdvices(ArrayList<Advice> adviceList) {
+
+        try {
+            //Guardamos los consejos en la base de datos
+            BufferedWriter writer = new BufferedWriter(new FileWriter(advicesFile, false));
+
+            for (Advice a: adviceList) {
+                writer.write(a.objetcToJSON()); //Insertamos el consejo en formato JSON dentro del archivo de texto
+                writer.newLine();
+            }
+
+            writer.close();
+
+            Log.e("msg", "Los consejos se han insertado en " + advicesFile.getName() + " exitosamente");
+
+        } catch (IOException e) {
+            Toast.makeText(context, "Error al escribir en el archivo " + advicesFile.getName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    public ArrayList<Advice> loadDevicesFromDatabase() {
+
+        ArrayList<Advice> adviceList = new ArrayList<Advice>();
+
+        try {
+
+            BufferedReader reader = new BufferedReader(new FileReader(advicesFile));
+
+            String data;
+            while ((data = reader.readLine()) != null) {
+
+                Log.e("msg", data);
+
+                //Convertimos el dato leido en un objeto de tipo Advice
+                Advice dbAdvice = new Gson().fromJson(data, Advice.class);
+
+                adviceList.add(dbAdvice);
+            }
+
+            reader.close();
+
+            Log.e("msg", "Se han cargado los concejos desde " + advicesFile.getName() + " exitosamente");
+
+            return adviceList;
+
+        } catch (IOException e) {
+            Toast.makeText(context, "Error leer los concejos en el archivo " + advicesFile.getName() + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        return null;
+
     }
 }

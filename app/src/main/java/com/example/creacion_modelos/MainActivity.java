@@ -16,9 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.creacion_modelos.helper.FileManager;
+import com.example.creacion_modelos.models.Advice;
 import com.example.creacion_modelos.models.Material;
 import com.example.creacion_modelos.models.Recycling;
 import com.example.creacion_modelos.models.User;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,7 +53,16 @@ public class MainActivity extends AppCompatActivity {
         baseMaterials.add(new Material("Vidrio", 800));
 
         //Recuperamos el usuario GLOBAL de la aplicación
-        user = ((User)getApplicationContext());
+        user = (User) getApplicationContext();
+
+        /*for (Recycling r : user.recyclings) {
+            Log.e("msg", "Fecha reciclaje: " + r.dateTime.toString());
+
+            for (Material m : r.materials) {
+                Log.e("msg", "Material: " + m.name + ", Price: " + m.price + ", Weight: " + m.weight + ", Gain: " + m.gain);
+            }
+            Log.e("msg", "----------------------------");
+        }*/
 
         recycling = new Recycling();
         recycling.materials = baseMaterials;
@@ -95,6 +106,14 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RecordsActivity.class);
             startActivity(intent);
         });
+
+
+
+
+
+
+
+
 
     }
 

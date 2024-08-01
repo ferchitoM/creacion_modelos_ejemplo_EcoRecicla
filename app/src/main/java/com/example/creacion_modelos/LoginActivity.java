@@ -15,7 +15,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.creacion_modelos.helper.Encrypt;
 import com.example.creacion_modelos.helper.FileManager;
+import com.example.creacion_modelos.models.Advice;
 import com.example.creacion_modelos.models.User;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -55,19 +59,20 @@ public class LoginActivity extends AppCompatActivity {
         //Obtenemos el usuario GLOBAL de la aplicación
         user            = (User) getApplicationContext();
         user            .setDefaultData();
-        user.email      = email;
-        user.password   = Encrypt.encryptPassword(password); //Encriptamos la constraseña ingresada
 
         if(!email.isEmpty() && !password.isEmpty()) {
+
+            user.email      = email;
+            user.password   = Encrypt.encryptPassword(password); //Encriptamos la constraseña ingresada
 
             FileManager fileManager = new FileManager(this);
 
             //Validar credenciales en base de datos
-            User result = fileManager.findUserByEmailAndPassword(user);
+            User userLogged = fileManager.findUserByEmailAndPassword(user);
 
-            if (result != null) {
+            if (userLogged != null) {
 
-                user.copyData(result); //Actualizamos el usuario GLOBAL de la aplicación con los datos de la base de datos
+                user.copyData(userLogged); //Actualizamos el usuario GLOBAL de la aplicación con los datos de la base de datos
 
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);

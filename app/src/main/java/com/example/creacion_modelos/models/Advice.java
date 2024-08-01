@@ -1,5 +1,9 @@
 package com.example.creacion_modelos.models;
 
+import android.util.Log;
+
+import com.google.gson.Gson;
+
 public class Advice {
 
     public String title; //Aprovecha mejor el papel
@@ -19,5 +23,14 @@ public class Advice {
         this.description = description;
         this.image = image;
         this.url = url;
+    }
+
+    public String objetcToJSON (){
+
+        String jsonData = new Gson().toJson(this);
+        Log.e("msg", "User to json: " + jsonData);
+
+        return jsonData;
+
     }
 }
