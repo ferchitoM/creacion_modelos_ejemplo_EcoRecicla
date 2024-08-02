@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 user.copyData(userLogged); //Actualizamos el usuario GLOBAL de la aplicación con los datos de la base de datos
 
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, StatisticsActivity.class);
                 startActivity(intent);
 
                 Toast.makeText(this, "Bienvenido", Toast.LENGTH_LONG).show();

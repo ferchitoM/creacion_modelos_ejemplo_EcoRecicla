@@ -59,7 +59,5 @@ public class AdviceActivity extends AppCompatActivity {
         listaHorizontal .setHasFixedSize(true);
         listaHorizontal .setAdapter(adapter);
 
-
-
     }
 }

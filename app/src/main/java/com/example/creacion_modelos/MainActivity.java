@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView                lista;
     MaterialRecyclingAdapter    adapter;
-    ArrayList<Material>         baseMaterials;
     Button                      botonRegistrar;
     Button                      botonReiniciar;
     Button                      botonRecords;
@@ -44,13 +43,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        baseMaterials = new ArrayList<Material>();
-        baseMaterials.add(new Material("Papel", 1000));
-        baseMaterials.add(new Material("Cartón", 500));
-        baseMaterials.add(new Material("Metal", 1500));
-        baseMaterials.add(new Material("Plástico", 2000));
-        baseMaterials.add(new Material("Vidrio", 800));
 
         //Recuperamos el usuario GLOBAL de la aplicación
         user = (User) getApplicationContext();
@@ -65,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
         recycling = new Recycling();
-        recycling.materials = baseMaterials;
+        recycling.materials = Recycling.getBaseMaterials();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 

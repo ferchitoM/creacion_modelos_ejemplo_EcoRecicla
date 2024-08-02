@@ -25,6 +25,19 @@ public class Recycling {
         this.materials  = materials;
     }
 
+    public static ArrayList<Material> getBaseMaterials(){
+
+        ArrayList<Material>baseMaterials = new ArrayList<Material>();
+
+        baseMaterials.add(new Material("Papel", 1000));
+        baseMaterials.add(new Material("Cartón", 500));
+        baseMaterials.add(new Material("Metal", 1500));
+        baseMaterials.add(new Material("Plástico", 2000));
+        baseMaterials.add(new Material("Vidrio", 800));
+
+        return baseMaterials;
+    }
+
     public void addMaterial(Material material){
         this.materials.add(material);
     }
@@ -77,4 +90,5 @@ public class Recycling {
         return jsonData;
 
     }
+
 }

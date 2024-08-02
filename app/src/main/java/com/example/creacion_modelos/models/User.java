@@ -2,6 +2,8 @@ package com.example.creacion_modelos.models;
 
 import android.util.Log;
 import com.google.gson.Gson;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import android.app.Application;
 
@@ -17,6 +19,9 @@ public class User extends Application {
     public int      age;
     public ArrayList<Recycling> recyclings;
 
+    public ArrayList<Float> weigthStats; //Estadísticas de peso
+    public ArrayList<Float> gainStats; //Estadísticas de ganancias
+
     public User() {
         this.name           = "";
         this.surName        = "";
@@ -27,8 +32,9 @@ public class User extends Application {
         this.gender         = "";
         this.age            = 0;
         this.recyclings     = new ArrayList<Recycling>();
+        this.weigthStats    = new ArrayList<Float>();
+        this.gainStats      = new ArrayList<Float>();
     }
-
 
     public User(String name, String surName, String imageProfile, String email, Long phone, String password, String gender, int age) {
         this.name           = name;
@@ -40,6 +46,8 @@ public class User extends Application {
         this.gender         = gender;
         this.age            = age;
         this.recyclings     = new ArrayList<Recycling>();
+        this.weigthStats    = new ArrayList<Float>();
+        this.gainStats      = new ArrayList<Float>();
     }
 
     public void setDefaultData(){
@@ -52,6 +60,8 @@ public class User extends Application {
         this.gender         = "";
         this.age            = 0;
         this.recyclings     = new ArrayList<Recycling>();
+        this.weigthStats    = new ArrayList<Float>();
+        this.gainStats      = new ArrayList<Float>();
     }
 
     public void copyData(User newData){
@@ -64,6 +74,8 @@ public class User extends Application {
         this.gender         = newData.gender;
         this.age            = newData.age;
         this.recyclings     = newData.recyclings;
+        this.weigthStats    = newData.weigthStats;
+        this.gainStats      = newData.gainStats;
     }
 
     public void addRecycling(Recycling recycling) {
@@ -89,5 +101,73 @@ public class User extends Application {
 
         return jsonData;
 
+    }
+
+    public void calculateWeigthStats(){
+
+        ArrayList<Material> materialList = Recycling.getBaseMaterials();
+
+        Log.e("msg", "Calculando Estadisticas de peso...");
+
+        for(Material list : materialList) {
+            Log.e("msg", "Buscando Material... " + list.name);
+
+            float suma      = 0;
+            int cantidad    = 0;
+            float promedio  = 0;
+
+            for (Recycling r : this.recyclings) {
+                Log.e("msg", "Reciclaje: " + r.dateTime.toString());
+
+                for (Material m : r.materials) {
+                    Log.e("msg", "Material: " + m.name);
+
+                    if(list.name.equals(m.name)) {
+                        cantidad++;
+                        suma += m.weight;
+                        Log.e("msg", "(Encontrado) ---> " + m.weight);
+
+                        break;
+                    }
+                }
+                promedio = suma / cantidad;
+            }
+            this.weigthStats.add(promedio);
+            Log.e("msg", "Promedio de " + list.name + ": " + promedio);
+        }
+    }
+
+    public void calculateGainStats(){
+
+        ArrayList<Material> materialList = Recycling.getBaseMaterials();
+
+        Log.e("msg", "Calculando Estadisticas de ganancias...");
+
+        for(Material list : materialList) {
+            Log.e("msg", "Buscando Material... " + list.name);
+
+            float suma      = 0;
+            int cantidad    = 0;
+            float promedio  = 0;
+
+            for (Recycling r : this.recyclings) {
+                Log.e("msg", "Reciclaje: " + r.dateTime.toString());
+
+                for (Material m : r.materials) {
+                    Log.e("msg", "Material: " + m.name);
+
+                    if(list.name.equals(m.name)) {
+                        cantidad++;
+                        suma += m.gain;
+                        Log.e("msg", "(Encontrado) ---> " + m.gain);
+
+                        break;
+                    }
+                }
+                promedio = suma / cantidad;
+            }
+            this.gainStats.add(promedio);
+            Log.e("msg", "Promedio de " + list.name + ": " + promedio);
+        }
     }
 }
