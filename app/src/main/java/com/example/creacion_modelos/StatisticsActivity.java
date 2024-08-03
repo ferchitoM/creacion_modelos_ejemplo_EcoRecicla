@@ -13,8 +13,12 @@ import androidx.core.content.ContextCompat;
 import com.example.creacion_modelos.helper.FileManager;
 import com.example.creacion_modelos.models.Material;
 import com.example.creacion_modelos.models.Recycling;
+import com.example.creacion_modelos.models.Statistics;
 import com.example.creacion_modelos.models.User;
+import com.example.creacion_modelos.models.ValueStats;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -22,47 +26,69 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.StackedValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.model.GradientColor;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.material.slider.LabelFormatter;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StatisticsActivity extends AppCompatActivity {
 
-    private BarChart grafico;
-    private BarChart grafico2;
+    User user;
+    private BarChart    graficoBarras;
+    private LineChart   graficoLineas;
+    private PieChart    graficoTorta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
 
-        grafico = findViewById(R.id.grafico);
-        grafico2 = findViewById(R.id.grafico2);
+        user = (User) getApplicationContext();
+        user.calculateWeigthStats(); //Calcular las estadisticas de lo reciclajes del usuario
+        user.calculateGainStats(); //Calcular las estadisticas de lo reciclajes del usuario
 
-        grafico.setDrawBarShadow(false); //Muestra la sombra de las barras
-        grafico.setDrawValueAboveBar(true); //Muestra el valor encima de la barra
-        grafico.getDescription().setEnabled(false); //Muestra la descripcion de la grafica
-        grafico.setMaxVisibleValueCount(60); //Muestra solo hasta 60 barras
-        grafico.setPinchZoom(true); //No se puede hacer zoom
-        grafico.setDrawGridBackground(false); //No se muestra el fondo de la grafica
+        graficoBarras   = findViewById(R.id.graficoBarras);
+        graficoLineas   = findViewById(R.id.graficoLineas);
+        graficoTorta    = findViewById(R.id.graficoTorta);
+
+        graficoBarras   .getAxisRight().setEnabled(false); //No se muestra el eje derecho de la grafica
+        graficoLineas   .getXAxis().setEnabled(false);
+        graficoLineas   .getAxisLeft().setEnabled(false);
+        graficoLineas   .getAxisRight().setEnabled(false);
 
 
-        grafico2.setDrawBarShadow(false); //Muestra la sombra de las barras
-        grafico2.setDrawValueAboveBar(true); //Muestra el valor encima de la barra
-        grafico2.getDescription().setEnabled(false); //Muestra la descripcion de la grafica
-        grafico2.setMaxVisibleValueCount(60); //Muestra solo hasta 60 barras
-        grafico2.setPinchZoom(true); //No se puede hacer zoom
-        grafico2.setDrawGridBackground(false);
+        graficarPesos(); //grafico de barras
+        graficarGanancias(); //grafico de lineas
+        graficarPorcentajeGanancias(); //grafico de torta
+    }
 
-        Legend lenged = grafico.getLegend(); //Muestra la leyenda de la grafica
+    private void configurarLeyenda(Object grafico, Class clazz){
+
+        Legend lenged = new Legend();
+
+        if(clazz == BarChart.class) lenged  = ((BarChart)   grafico).getLegend(); //Muestra la leyenda de la grafica
+        if(clazz == LineChart.class) lenged = ((LineChart)  grafico).getLegend(); //Muestra la leyenda de la grafica
+        if(clazz == PieChart.class) lenged  = ((PieChart)   grafico).getLegend(); //Muestra la leyenda de la grafica
+
         lenged.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM); //Alineacion vertical de la leyenda
         lenged.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER); //Alineacion horizontal de la leyenda
         lenged.setOrientation(Legend.LegendOrientation.HORIZONTAL); //Orientacion de la leyenda
@@ -70,27 +96,58 @@ public class StatisticsActivity extends AppCompatActivity {
         lenged.setForm(Legend.LegendForm.SQUARE); //Forma de la leyenda
         lenged.setFormSize(9f); //Tamaño de la forma de la leyenda
         lenged.setTextSize(14f); //Tamaño del texto de la leyenda
-        lenged.setXEntrySpace(4f); //Espacio entre las barras
+        lenged.setXEntrySpace(4f); //Espacio entre las
+    }
 
-        Legend lenged2 = grafico2.getLegend(); //Muestra la leyenda de la grafica
-        lenged2.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM); //Alineacion vertical de la leyenda
-        lenged2.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER); //Alineacion horizontal de la leyenda
-        lenged2.setOrientation(Legend.LegendOrientation.HORIZONTAL); //Orientacion de la leyenda
-        lenged2.setDrawInside(false); //No se muestra dentro de la grafica
-        lenged2.setForm(Legend.LegendForm.SQUARE); //Forma de la leyenda
-        lenged2.setFormSize(9f); //Tamaño de la forma de la leyenda
-        lenged2.setTextSize(14f); //Tamaño del texto de la leyenda
-        lenged2.setXEntrySpace(4f); //Espacio entre las
+    private void configurarEjes(Object grafico, Class clazz){
 
-        graficarPesos();
-        graficarGanancias();
+        //Eje X
+        String[] labelsEjeX = new String[Recycling.getBaseMaterials().size()]; //Labels con los nombres de los materiales
+
+        for (int i = 0; i < Recycling.getBaseMaterials().size(); i++) {
+            labelsEjeX[i] = Recycling.getBaseMaterials().get(i).name;
+        }
+
+        XAxis ejeX = new XAxis();
+
+        if(clazz == BarChart.class) ejeX  = ((BarChart)   grafico).getXAxis(); //Obtenemos el eje X del gráfico
+        if(clazz == LineChart.class) ejeX = ((LineChart)  grafico).getXAxis(); //Obtenemos el eje X del gráfico
+        if(clazz == PieChart.class) ejeX  = ((PieChart)   grafico).getXAxis(); //Obtenemos el eje X del gráfico
+
+        ejeX        .setGranularity(1f);
+        ejeX        .setGranularityEnabled(true);
+        ejeX        .setCenterAxisLabels(false); //Centra los labels
+        ejeX        .setDrawGridLines(false); //No se muestra la grilla de las barras
+        ejeX        .setPosition(XAxis.XAxisPosition.BOTTOM);
+        ejeX        .setLabelCount(labelsEjeX.length - 1);
+        ejeX        .setTextSize(12f);
+        //ejeX      .setLabelRotationAngle(-30f);
+        ejeX        .setValueFormatter(new IndexAxisValueFormatter(labelsEjeX));
+
+        //EjeY
+        YAxis ejeY = new YAxis();
+
+        if(clazz == BarChart.class) ejeY  = ((BarChart)   grafico).getAxisLeft(); //Obtenemos el eje Y del gráfico
+        if(clazz == LineChart.class) ejeY = ((LineChart)  grafico).getAxisLeft(); //Obtenemos el eje Y del gráfico
+
+        ejeY        .setValueFormatter(new LargeValueFormatter()); //Formato de los valores del eje Y
+        ejeY        .setDrawGridLines(true); //Se muestra la grilla de las barras
+        ejeY        .setSpaceTop(10f); //Espacio entre la linea y el eje
+        ejeY        .setAxisMinimum(0f); //Valor minimo del eje Y
     }
 
     private void graficarPesos() {
 
-        User user = (User) getApplicationContext();
-        user.calculateWeigthStats(); //Calcular las estadisticas de lo reciclajes del usuario
-        Log.e("msg", "Stats: " + user.weigthStats);
+        //configuramos el gráfico
+        graficoBarras.setDrawBarShadow(false); //Muestra la sombra de las barras
+        graficoBarras.setDrawValueAboveBar(true); //Muestra el valor encima de la barra
+        graficoBarras.getDescription().setEnabled(false); //Muestra la descripcion de la grafica
+        graficoBarras.setMaxVisibleValueCount(60); //Muestra solo hasta 60 barras
+        graficoBarras.setPinchZoom(true); //No se puede hacer zoom
+        graficoBarras.setDrawGridBackground(false); //No se muestra el fondo de la grafica
+
+        configurarLeyenda(graficoBarras, BarChart.class);
+        configurarEjes(graficoBarras, BarChart.class);
 
         ArrayList<BarEntry> barras = new ArrayList<>();
 
@@ -100,30 +157,10 @@ public class StatisticsActivity extends AppCompatActivity {
             count++;
         }
 
-        BarDataSet adapter = new BarDataSet(barras, "Estadísticas Julio 2024");
+        BarDataSet adapter = new BarDataSet(barras, "Promedio de pesos");
         adapter.setDrawIcons(false); //Mostrar iconos
 
         //adapter.setColors(new int[] { R.color.black, R.color.verde_claro, R.color.verde_transparente }, getApplicationContext());
-
-        /*
-        int startColor1 = ContextCompat.getColor(this, android.R.color.holo_orange_light);
-        int startColor2 = ContextCompat.getColor(this, android.R.color.holo_blue_light);
-        int startColor3 = ContextCompat.getColor(this, android.R.color.holo_orange_light);
-        int startColor4 = ContextCompat.getColor(this, android.R.color.holo_green_light);
-        int startColor5 = ContextCompat.getColor(this, android.R.color.holo_red_light);
-        int endColor1 = ContextCompat.getColor(this, android.R.color.holo_blue_dark);
-        int endColor2 = ContextCompat.getColor(this, android.R.color.holo_purple);
-        int endColor3 = ContextCompat.getColor(this, android.R.color.holo_green_dark);
-        int endColor4 = ContextCompat.getColor(this, android.R.color.holo_red_dark);
-        int endColor5 = ContextCompat.getColor(this, android.R.color.holo_orange_dark);
-
-        List<GradientColor> gradientFills = new ArrayList<>();
-        gradientFills.add(new GradientColor(startColor1, endColor1));
-        gradientFills.add(new GradientColor(startColor2, endColor2));
-        gradientFills.add(new GradientColor(startColor3, endColor3));
-        gradientFills.add(new GradientColor(startColor4, endColor4));
-        gradientFills.add(new GradientColor(startColor5, endColor5));
-        adapter.setGradientColors(gradientFills);*/
 
         adapter.setColors(ColorTemplate.MATERIAL_COLORS);
 
@@ -131,138 +168,126 @@ public class StatisticsActivity extends AppCompatActivity {
         config.setBarWidth(0.9f); //Ancho de las barras
         config.setValueTextSize(14f); //Tamaño del texto de los valores
 
-        grafico.setData(config); //Asignar los datos a la grafica
-        grafico.setFitBars(false); //Ajuste automatico de las barras
-        grafico.invalidate(); //Actualizar la grafica
+        graficoBarras.setData(config); //Asignar los datos a la grafica
+        graficoBarras.setFitBars(false); //Ajuste automatico de las barras
+        graficoBarras.invalidate(); //Actualizar la grafica
 
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
-            ArrayList<Material> materialList = Recycling.getBaseMaterials();
-
+        ValueFormatter formatter = new ValueFormatter() {
             @Override
-            public String getFormattedValue(float index, AxisBase axis) {
-                return materialList.get((int) index).name;
+            public String getFormattedValue(float value) {
+
+                DecimalFormat df = new DecimalFormat("#.#kg");
+                return df.format(value);
             }
         };
 
-        //Eje X
-        String[] labelsEjeX = new String[Recycling.getBaseMaterials().size()];
-
-        for (int i = 0; i < Recycling.getBaseMaterials().size(); i++) {
-            labelsEjeX[i] = Recycling.getBaseMaterials().get(i).name;
-
-            Log.e("msg", "Label eje x: " + labelsEjeX[i]);
-        }
-
-        XAxis ejeX = grafico.getXAxis(); //Obtenemos el eje x del gráfico
-
-        ejeX.setGranularity(1f);
-        ejeX.setGranularityEnabled(true);
-        ejeX.setCenterAxisLabels(false); //Centra los labels
-        ejeX.setDrawGridLines(false); //No se muestra la grilla de las barras
-        ejeX.setPosition(XAxis.XAxisPosition.BOTTOM);
-        ejeX.setLabelCount(labelsEjeX.length - 1);
-        ejeX.setTextSize(12f);
-        //ejeX.setLabelRotationAngle(-30f);
-
-        ejeX.setValueFormatter(new IndexAxisValueFormatter(labelsEjeX));
-
-        //EjeY
-        grafico.getAxisRight().setEnabled(false); //No se muestra el eje derecho de la grafica
-        YAxis ejeY = grafico.getAxisLeft(); //Obtenemos el eje Y del gráfico
-        ejeY.setValueFormatter(new LargeValueFormatter()); //Formato de los valores del eje Y
-        ejeY.setDrawGridLines(true); //Se muestra la grilla de las barras
-        ejeY.setSpaceTop(10f); //Espacio entre la linea y el eje
-        ejeY.setAxisMinimum(0f); //Valor minimo del eje Y
+        config.setValueFormatter(formatter);
 
     }
 
     private void graficarGanancias() {
 
-        User user = (User) getApplicationContext();
-        user.calculateGainStats(); //Calcular las estadisticas de lo reciclajes del usuario
-        Log.e("msg", "Stats: " + user.gainStats);
+        graficoLineas.getDescription().setEnabled(false); //Muestra la descripcion de la grafica
+        graficoLineas.setMaxVisibleValueCount(60); //Muestra solo hasta 60 barras
+        graficoLineas.setPinchZoom(true); //No se puede hacer zoom
+        graficoLineas.setDrawGridBackground(false);
 
-        ArrayList<BarEntry> barras = new ArrayList<>();
+        configurarLeyenda(graficoLineas, LineChart.class);
+        //configurarEjes(graficoLineas, LineChart.class);
 
-        int count = 0;
-        for (float promedio : user.gainStats) {
-            barras.add(new BarEntry(count, promedio));
-            count++;
+        ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+
+        int i = 0;
+        for(Statistics stats : user.gainStats) {
+
+            ArrayList<Entry> lineas = new ArrayList<>();
+
+            int count = 0;
+            for (ValueStats g : stats.gains) {
+                lineas.add(new Entry(count, g.value.floatValue()));
+
+                Log.e("msg", "Material: " + stats.materialName + " x: " + count + " y: " + g.value.floatValue());
+
+                count++;
+            }
+
+            LineDataSet adapter = new LineDataSet(lineas, stats.materialName);
+            adapter.setDrawIcons(false); //Mostrar iconos
+
+            adapter.setColor(ColorTemplate.MATERIAL_COLORS[i]);
+            //adapter.setCircleColor(Color.DKGRAY);
+            adapter.setLineWidth(4f);
+            adapter.setCircleRadius(6f);
+            adapter.setValueTextSize(9f);
+            adapter.setFormLineWidth(1f);
+
+            dataSets.add(adapter);
+
+            if(i < ColorTemplate.MATERIAL_COLORS.length - 1) i++;
+            else i = 0;
         }
 
-        BarDataSet adapter = new BarDataSet(barras, "Estadísticas Julio 2024");
-        adapter.setDrawIcons(false); //Mostrar iconos
 
-        //adapter.setColors(new int[] { R.color.black, R.color.verde_claro, R.color.verde_transparente }, getApplicationContext());
-
-        /*
-        int startColor1 = ContextCompat.getColor(this, android.R.color.holo_orange_light);
-        int startColor2 = ContextCompat.getColor(this, android.R.color.holo_blue_light);
-        int startColor3 = ContextCompat.getColor(this, android.R.color.holo_orange_light);
-        int startColor4 = ContextCompat.getColor(this, android.R.color.holo_green_light);
-        int startColor5 = ContextCompat.getColor(this, android.R.color.holo_red_light);
-        int endColor1 = ContextCompat.getColor(this, android.R.color.holo_blue_dark);
-        int endColor2 = ContextCompat.getColor(this, android.R.color.holo_purple);
-        int endColor3 = ContextCompat.getColor(this, android.R.color.holo_green_dark);
-        int endColor4 = ContextCompat.getColor(this, android.R.color.holo_red_dark);
-        int endColor5 = ContextCompat.getColor(this, android.R.color.holo_orange_dark);
-
-        List<GradientColor> gradientFills = new ArrayList<>();
-        gradientFills.add(new GradientColor(startColor1, endColor1));
-        gradientFills.add(new GradientColor(startColor2, endColor2));
-        gradientFills.add(new GradientColor(startColor3, endColor3));
-        gradientFills.add(new GradientColor(startColor4, endColor4));
-        gradientFills.add(new GradientColor(startColor5, endColor5));
-        adapter.setGradientColors(gradientFills);*/
-
-        adapter.setColors(ColorTemplate.MATERIAL_COLORS);
-
-        BarData config = new BarData(adapter); //Crear los datos de la grafica
-        config.setBarWidth(0.9f); //Ancho de las barras
+        LineData config = new LineData(dataSets); //Crear los datos de la grafica
         config.setValueTextSize(14f); //Tamaño del texto de los valores
 
-        grafico2.setData(config); //Asignar los datos a la grafica
-        grafico2.setFitBars(false); //Ajuste automatico de las barras
-        grafico2.invalidate(); //Actualizar la grafica
+        graficoLineas.setData(config); //Asignar los datos a la grafica
+        graficoLineas.invalidate(); //Actualizar la grafica
 
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
-            ArrayList<Material> materialList = Recycling.getBaseMaterials();
-
+        ValueFormatter formatter = new ValueFormatter() {
             @Override
-            public String getFormattedValue(float index, AxisBase axis) {
-                return materialList.get((int) index).name;
+            public String getFormattedValue(float value) {
+
+                DecimalFormat df = new DecimalFormat("#.#k");
+                return  df.format(value/1000.0);
             }
         };
 
-        //Eje X
-        String[] labelsEjeX = new String[Recycling.getBaseMaterials().size()];
+        config.setValueFormatter(formatter);
+        YAxis left = graficoLineas.getAxisLeft();
+        left.setValueFormatter(formatter);
+    }
 
-        for (int i = 0; i < Recycling.getBaseMaterials().size(); i++) {
-            labelsEjeX[i] = Recycling.getBaseMaterials().get(i).name;
+    private void graficarPorcentajeGanancias() {
 
-            Log.e("msg", "Label eje x: " + labelsEjeX[i]);
+        graficoTorta.setUsePercentValues(true);
+        graficoTorta.getDescription().setEnabled(false); //Muestra la descripcion de la grafica
+        configurarLeyenda(graficoTorta, PieChart.class);
+        //configurarEjes(graficoLineas, LineChart.class);
+
+        ArrayList<PieEntry> porcentajes = new ArrayList<>();
+
+        int count = 0;
+        for (Statistics stats : user.gainStats) {
+            porcentajes.add(new PieEntry((float) stats.totalGain, stats.materialName));
+
+            Log.e("msg", "Material: " + stats.materialName + " total Gain: " + stats.totalGain);
+
+            count++;
         }
 
-        XAxis ejeX = grafico2.getXAxis(); //Obtenemos el eje x del gráfico
+        PieDataSet adapter = new PieDataSet(porcentajes, "");
+        adapter.setDrawIcons(false); //Mostrar iconos
 
-        ejeX.setGranularity(1f);
-        ejeX.setGranularityEnabled(true);
-        ejeX.setCenterAxisLabels(false); //Centra los labels
-        ejeX.setDrawGridLines(false); //No se muestra la grilla de las barras
-        ejeX.setPosition(XAxis.XAxisPosition.BOTTOM);
-        ejeX.setLabelCount(labelsEjeX.length - 1);
-        ejeX.setTextSize(12f);
-        //ejeX.setLabelRotationAngle(-30f);
+        adapter.setColors(ColorTemplate.MATERIAL_COLORS);
+        adapter.setValueTextSize(9f);
+        adapter.setFormLineWidth(1f);
 
-        ejeX.setValueFormatter(new IndexAxisValueFormatter(labelsEjeX));
+        PieData config = new PieData(adapter); //Crear los datos de la grafica
+        config.setValueTextSize(14f); //Tamaño del texto de los valores
 
-        //EjeY
-        grafico2.getAxisRight().setEnabled(false); //No se muestra el eje derecho de la grafica
-        YAxis ejeY = grafico2.getAxisLeft(); //Obtenemos el eje Y del gráfico
-        ejeY.setValueFormatter(new LargeValueFormatter()); //Formato de los valores del eje Y
-        ejeY.setDrawGridLines(true); //Se muestra la grilla de las barras
-        ejeY.setSpaceTop(10f); //Espacio entre la linea y el eje
-        ejeY.setAxisMinimum(0f); //Valor minimo del eje Y
+        graficoTorta.setData(config); //Asignar los datos a la grafica
+        graficoTorta.invalidate(); //Actualizar la grafica
 
+        ValueFormatter formatter = new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+
+                DecimalFormat df = new DecimalFormat("#.#%");
+                return df.format(value/100.0);
+            }
+        };
+
+        config.setValueFormatter(formatter);
     }
 }

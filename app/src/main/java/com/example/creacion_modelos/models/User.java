@@ -4,7 +4,10 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
+
 import android.app.Application;
 
 public class User extends Application {
@@ -20,7 +23,7 @@ public class User extends Application {
     public ArrayList<Recycling> recyclings;
 
     public ArrayList<Float> weigthStats; //Estadísticas de peso
-    public ArrayList<Float> gainStats; //Estadísticas de ganancias
+    public ArrayList<Statistics> gainStats; //Estadísticas de ganancias
 
     public User() {
         this.name           = "";
@@ -33,7 +36,7 @@ public class User extends Application {
         this.age            = 0;
         this.recyclings     = new ArrayList<Recycling>();
         this.weigthStats    = new ArrayList<Float>();
-        this.gainStats      = new ArrayList<Float>();
+        this.gainStats      = new ArrayList<Statistics>();
     }
 
     public User(String name, String surName, String imageProfile, String email, Long phone, String password, String gender, int age) {
@@ -47,7 +50,7 @@ public class User extends Application {
         this.age            = age;
         this.recyclings     = new ArrayList<Recycling>();
         this.weigthStats    = new ArrayList<Float>();
-        this.gainStats      = new ArrayList<Float>();
+        this.gainStats      = new ArrayList<Statistics>();
     }
 
     public void setDefaultData(){
@@ -61,7 +64,7 @@ public class User extends Application {
         this.age            = 0;
         this.recyclings     = new ArrayList<Recycling>();
         this.weigthStats    = new ArrayList<Float>();
-        this.gainStats      = new ArrayList<Float>();
+        this.gainStats      = new ArrayList<Statistics>();
     }
 
     public void copyData(User newData){
@@ -146,28 +149,34 @@ public class User extends Application {
         for(Material list : materialList) {
             Log.e("msg", "Buscando Material... " + list.name);
 
-            float suma      = 0;
-            int cantidad    = 0;
-            float promedio  = 0;
+
+            ArrayList<ValueStats> gains     = new ArrayList<ValueStats>();
+            ArrayList<ValueStats> weights   = new ArrayList<ValueStats>();
 
             for (Recycling r : this.recyclings) {
-                Log.e("msg", "Reciclaje: " + r.dateTime.toString());
+                Log.e("msg", "Reciclaje: " + r.dateTime);
 
                 for (Material m : r.materials) {
                     Log.e("msg", "Material: " + m.name);
 
                     if(list.name.equals(m.name)) {
-                        cantidad++;
-                        suma += m.gain;
+                        gains.add(new ValueStats(m.gain, r.dateTime));
+                        weights.add(new ValueStats(m.weight, r.dateTime));
+
                         Log.e("msg", "(Encontrado) ---> " + m.gain);
+                        Log.e("msg", "(Encontrado) ---> " + m.weight);
 
                         break;
                     }
                 }
-                promedio = suma / cantidad;
             }
-            this.gainStats.add(promedio);
-            Log.e("msg", "Promedio de " + list.name + ": " + promedio);
+
+            Statistics stats = new Statistics(list.name, gains, weights);
+            this.gainStats.add(stats);
+
+            Log.e("msg", "Total Gain: " + stats.totalGain + " Total Weight: " + stats.totalWeight);
+
         }
     }
+
 }
